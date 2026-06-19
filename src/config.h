@@ -1,4 +1,4 @@
-# PIN NUMBERS ARE PLACEHOLDERS -> hardware team to edit 
+// PIN NUMBERS ARE PLACEHOLDERS -> hardware team to edit 
 
 #pragma once
 
