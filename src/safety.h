@@ -13,3 +13,5 @@
 #define MAX_AMPLITUDE_PCT -1
 
 #define INTERPHASE_GAP_US -1
+
+#define MAX_SESSION_DURATION_MS -1
