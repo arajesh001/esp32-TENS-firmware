@@ -1,4 +1,4 @@
-#include "waveform.h"
+#include "WaveformGenerator.h"
 #include "safety.h"
 
 // Mode constructor
