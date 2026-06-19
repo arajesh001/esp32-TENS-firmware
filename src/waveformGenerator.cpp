@@ -1,4 +1,5 @@
 #include "waveform.h"
+#include "safety.h"
 
 // Mode constructor
 // BASED ON MODES 1-3 that the bio team provides
@@ -61,5 +62,40 @@ void WaveformGenerator::setAmplitudePct(float pct) { _amplitude_pct = pct;}
 void WaveformGenerator::setBiphasic(bool biphasic) { _biphasic = biphasic; }
 
 // TODOs
-void WaveformGenerator::_outputWaveform() {}
-void WaveformGenerator::_setPolarity(bool positive) {}
+void WaveformGenerator::_setPolarity(bool positive) {
+    digitalWrite(POLARITY_PIN, positive ? HIGH:LOW);
+}
+
+void WaveformGenerator::_outputWaveform() {
+    // clamp params to safe ranges
+    float freq = constrain(_frequency_hz, MIN_FREQ_HZ, MAX_FREQ_HZ);
+    uint32_t pw = constrain(_pulse_width_us, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US);
+    float amp = constrain(_amplitude_pct, MIN_AMPLITUDE_PCT, MAX_AMPLITUDE_PCT);
+
+    // deriving timings 
+    uint32_t period_us = static_cast<uint32_t>(1.0f / freq * 1000000.0f);
+    uint32_t interphase_us = INTERPHASE_GAP_US;
+    uint32_t duty = static_cast<uint32_t>(amp * 1023);
+
+    // deriving pos phase
+    _setPolarity(true);
+    ledcWrite(LEDC_CHANNEL, duty);
+    delayMicroseconds(pw);
+    ledcWrite(LEDC_CHANNEL, 0);
+
+    // deriving neg phase if _biphasic
+    if (_biphasic) {
+        delayMicroseconds(interphase_us);
+        _setPolarity(false);
+        ledcWrite(LEDC_CHANNEL, duty);
+        delayMicroseconds(pw);
+        ledcWrite(LEDC_CHANNEL, 0);
+        _setPolarity(true);
+    }
+
+    // wait the rest of the period
+    uint32_t pulse_time = _biphasic ? (2 * pw + interphase_us) : pw;
+    if (period_us > pulse_time) {
+        delayMicroseconds(period_us - pulse_time);
+    }
+}
