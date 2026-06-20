@@ -1,10 +1,9 @@
 #include <Arduino.h>
-#include "waveform.h"
+#include "TENSController.h"
 #include "config.h"
 #include "safety.h"
 
-// swap mode to 2, or 3 to test other modes
-WaveformGenerator generator(1);
+TENSController controller;
 
 void setup() {
     Serial.begin(115200);
@@ -18,8 +17,11 @@ void setup() {
     digitalWrite(POLARITY_PIN, HIGH);
     digitalWrite(ENABLE_PIN, LOW);
     digitalWrite(ENABLE_PIN, HIGH);
+
+    // swap mode to 2, or 3 to test other modes
+    controller.startSession(1);
 }
 
 void loop() {
-    generator.run();
+    controller.update();
 }

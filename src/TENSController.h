@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include "waveform.h"
+#include "WaveformGenerator.h"
 #include "safety.h"
 
 class TENSController {
